@@ -2,9 +2,14 @@ package RPC
 
 import (
 	"RPC/message"
+	"RPC/serialize"
 	"context"
+	"errors"
+	"github.com/silenceper/pool"
+	"net"
 	"reflect"
 	"sync/atomic"
+	"time"
 )
 
 var messageId uint32 = 0
@@ -13,7 +18,70 @@ type Service interface {
 	Name() string // 用name来寻找服务名称，至于你结构体，结构体里的方法字段叫什么已经解耦了
 }
 
-// 人们管proxy就叫做stub，也就是庄
+type Client struct {
+	coonPool   pool.Pool
+	serializer serialize.Serializer
+}
+
+func NewClient(addr string, serializer serialize.Serializer) (*Client, error) {
+	p, err := pool.NewChannelPool(&pool.Config{
+		InitialCap: 10,
+		MaxCap:     100,
+		MaxIdle:    30,
+		Factory: func() (interface{}, error) {
+			return net.Dial("tcp", addr)
+		}, // 这个pool缓存的内容是连接
+		Close: func(i interface{}) error {
+			return i.(net.Conn).Close()
+		},
+		IdleTimeout: time.Minute,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{
+		coonPool:   p,
+		serializer: serializer,
+	}, nil
+
+}
+
+func (c *Client) Invoke(ctx context.Context, req *message.Request) (*message.Response, error) {
+	obj, err := c.coonPool.Get()
+	defer func() {
+		c.coonPool.Put(obj)
+	}()
+	if err != nil {
+		return nil, err
+	}
+
+	conn := obj.(net.Conn)
+	// 真正把数据发出去
+	data := message.EncodeReq(req)
+	wLen, err := conn.Write(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if wLen != len(data) { // 几乎遇不到，如果遇到了，有没有更好的处理方法？
+		return nil, errors.New("rpc: 未写入全部数据")
+	}
+
+	// 该读数据了
+	// 我怎么知道该读取多长？相应的，服务端也会有这个问题。答案：你需要先传入一个长度字段，用于描述本次数据有多大
+
+	respMsg, err := ReadMsg(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	return message.DecodeResp(respMsg), nil
+}
+
+func (c *Client) Close() {
+	c.coonPool.Release()
+}
 
 func (c *Client) InitService(service Service) error { // 校验入参，调用proxy，接收返回值
 	// 可以校验，确保它是一个指向结构体的指针
