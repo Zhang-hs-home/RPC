@@ -3,7 +3,6 @@ package RPC
 import (
 	"RPC/message"
 	"RPC/serialize"
-	"RPC/serialize/json"
 	"context"
 	"errors"
 	"github.com/silenceper/pool"
@@ -18,7 +17,7 @@ type Client struct {
 	serializer serialize.Serializer
 }
 
-func NewClient(addr string) (*Client, error) {
+func NewClient(addr string, serializer serialize.Serializer) (*Client, error) {
 	p, err := pool.NewChannelPool(&pool.Config{
 		InitialCap: 10,
 		MaxCap:     100,
@@ -37,7 +36,7 @@ func NewClient(addr string) (*Client, error) {
 
 	return &Client{
 		coonPool:   p,
-		serializer: json.SerializerJson{}, // 默认用json，todo 后续改成创建时传入
+		serializer: serializer,
 	}, nil
 
 }

@@ -2,6 +2,7 @@ package RPC
 
 import (
 	"RPC/message"
+	"RPC/serialize/json"
 	"context"
 	"errors"
 	"github.com/stretchr/testify/assert"
@@ -11,7 +12,7 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(":8082")
+	c, err := NewClient(":8082", json.SerializerJson{})
 	require.NoError(t, err)
 	us := &UserServiceClient{}
 	err = c.InitService(us)
@@ -19,7 +20,6 @@ func TestNewClient(t *testing.T) {
 	resp, err := us.GetById(context.Background(), &GetByIdReq{Id: 100})
 	require.NoError(t, err)
 	log.Println(resp)
-
 }
 
 func TestInitClientProxy(t *testing.T) {

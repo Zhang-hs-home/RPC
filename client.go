@@ -52,7 +52,7 @@ func (c *Client) InitService(service Service) error { // 校验入参，调用pr
 			// 你可以对args和results进行校验
 			ctx, ok := args[0].Interface().(context.Context)
 			if !ok {
-				panic(interface{}("noshit"))
+				panic("noshit")
 			}
 			arg := args[1].Interface()
 			// 第一个返回值，是真的返回值，指向GetByIdResp

@@ -39,14 +39,3 @@ func ReadMsg(conn net.Conn) (bs []byte, err error) {
 
 	return bs, err
 }
-
-func EncodeMsg(data []byte) []byte {
-	l := len(data)
-	resp := make([]byte, l+lenBytes)
-	// 先放入长度
-	binary.BigEndian.PutUint64(resp, uint64(l))
-	// 再放入内容
-	copy(resp[lenBytes:], data)
-	return resp
-
-}
