@@ -11,6 +11,7 @@ func main() {
 	srv := RPC.NewServer()
 	// 注册server服务
 	srv.MustRegister(&UserService{})
+	srv.MustRegister(&UserParentService{})
 	// 注册server支持的序列化协议
 	srv.RegisterSerializer(json.SerializerJson{})
 	srv.RegisterSerializer(protobuf.SerializerProto{})

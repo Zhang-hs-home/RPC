@@ -9,7 +9,6 @@ import (
 	"log"
 	"net"
 	"reflect"
-	"sync/atomic"
 )
 
 type Server struct {
@@ -46,7 +45,6 @@ func (s *Server) RegisterSerializer(serializer serialize.Serializer) {
 }
 
 func (s *Server) Start(addr string) error {
-	var num int64
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err
@@ -60,8 +58,6 @@ func (s *Server) Start(addr string) error {
 			continue
 		}
 		go func() {
-			atomic.AddInt64(&num, 1)
-			log.Println(num)
 			if er := s.HandleConn(conn); er != nil {
 				log.Println("handle connection failed, err: ", er)
 				conn.Close() // 返回了，说明返回的是error，这个连接已经用不上了，可以关闭了

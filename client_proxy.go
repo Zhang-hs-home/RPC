@@ -20,14 +20,14 @@ type Client struct {
 func NewClient(addr string, serializer serialize.Serializer) (*Client, error) {
 	p, err := pool.NewChannelPool(&pool.Config{
 		InitialCap: 10,
-		MaxCap:     100,
-		MaxIdle:    30,
+		MaxCap:     10,
+		MaxIdle:    10,
 		Factory: func() (interface{}, error) {
 			return net.Dial("tcp", addr)
-		}, // 这个pool缓存的东西是连接
+		}, // 这个pool缓存的内容是连接
 		Close: func(i interface{}) error {
 			return i.(net.Conn).Close()
-		}, // 在垃圾回收的时候，它会帮你调用close方法关掉连接
+		},
 		IdleTimeout: time.Minute,
 	})
 	if err != nil {
@@ -67,5 +67,10 @@ func (c *Client) Invoke(ctx context.Context, req *message.Request) (*message.Res
 		return nil, err
 	}
 
+	c.coonPool.Put(obj)
 	return message.DecodeResp(respMsg), nil
+}
+
+func (c *Client) Close() {
+	c.coonPool.Release()
 }

@@ -52,7 +52,7 @@ func (c *Client) InitService(service Service) error { // 校验入参，调用pr
 			// 你可以对args和results进行校验
 			ctx, ok := args[0].Interface().(context.Context)
 			if !ok {
-				panic("noshit")
+				panic("system internal error")
 			}
 			arg := args[1].Interface()
 			// 第一个返回值，是真的返回值，指向GetByIdResp
@@ -97,7 +97,6 @@ func (c *Client) InitService(service Service) error { // 校验入参，调用pr
 				err = c.serializer.Decode(res.Data, first)
 			}
 
-			// 我们假定使用json序列化的
 			results = append(results, reflect.ValueOf(first))
 			// 第二个返回值，是error
 			if err != nil {
