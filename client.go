@@ -9,22 +9,6 @@ import (
 
 var messageId uint32 = 0
 
-type UserServiceClient struct {
-	GetById func(ctx context.Context, req *GetByIdReq) (*GetByIdResp, error)
-}
-
-func (u *UserServiceClient) Name() string {
-	return "user-service"
-}
-
-type GetByIdReq struct {
-	Id int
-}
-
-type GetByIdResp struct {
-	Name string `json:"name"`
-}
-
 type Service interface {
 	Name() string // 用name来寻找服务名称，至于你结构体，结构体里的方法字段叫什么已经解耦了
 }

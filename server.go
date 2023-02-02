@@ -32,6 +32,7 @@ func (s *Server) MustRegister(service Service) {
 		panic(err)
 	}
 }
+
 func (s *Server) RegisterService(service Service) error {
 	s.services[service.Name()] = reflectionStub{
 		value:       reflect.ValueOf(service),
@@ -104,7 +105,6 @@ func (s *Server) HandleConn(conn net.Conn) error {
 		// 找到方法 这里只能通过反射 没别的路子
 
 		// 把参数传进去
-		// context 建起来 todo 如何将元数据结合起来
 		ctx := context.Background()
 		// 需要把req.Arg 赋值给methodReq Arg是map[string]interface{}类型
 		// 编码resp返回
