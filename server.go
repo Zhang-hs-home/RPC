@@ -6,6 +6,7 @@ import (
 	"RPC/serialize/json"
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"reflect"
@@ -51,22 +52,22 @@ func (s *Server) Start(addr string) error {
 		return err
 	}
 
-	//go func() {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Println("accept connection failed, err: ", err)
 			continue
 		}
+		log.Println("receive connection: ", conn.RemoteAddr(), " -> ", conn.LocalAddr())
 		go func() {
 			if er := s.HandleConn(conn); er != nil {
 				log.Println("handle connection failed, err: ", er)
-				conn.Close() // 返回了，说明返回的是error，这个连接已经用不上了，可以关闭了
+				conn.Close()
 				return
 			}
 		}()
 	}
-	//}()
+
 }
 
 func (s *Server) HandleConn(conn net.Conn) error {
@@ -149,6 +150,10 @@ func (s *reflectionStub) invoke(ctx context.Context, req *message.Request) ([]by
 	}
 
 	method := s.value.MethodByName(methodName)
+	if !method.IsValid() {
+		return nil, errors.New(fmt.Sprintf("%s%s", "服务下不存在该方法，方法名为：", methodName))
+	}
+
 	inType := method.Type().In(1)
 	in := reflect.New(inType.Elem())
 	err := serializer.Decode(data, in.Interface())

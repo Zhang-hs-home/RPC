@@ -28,7 +28,7 @@ func TestNewClient(t *testing.T) {
 	c, err := NewClient(":8082", json.SerializerJson{})
 	require.NoError(t, err)
 	us := &UserServiceClient{}
-	err = c.InitService(us)
+	err = c.InitStub(us)
 	require.NoError(t, err)
 	resp, err := us.GetById(context.Background(), &GetByIdReq{Id: 100})
 	require.NoError(t, err)

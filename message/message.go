@@ -10,7 +10,7 @@ const (
 	pairSplitter = '\r'
 )
 
-// ------------------------- 这个就是你的自定义协议 --------------------------
+// ------------------------- 这个就是自定义协议 --------------------------
 
 type Request struct {
 	// 头部长度
@@ -25,7 +25,7 @@ type Request struct {
 	Compressor byte
 	// 序列化协议
 	Serializer byte
-	// cpun内存对齐占位符 不会传入网络 todo 了解原理
+	// cpu内存对齐占位符 不会传入网络
 	Padding byte
 	// 服务名
 	ServiceName string

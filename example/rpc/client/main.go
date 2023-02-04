@@ -19,13 +19,13 @@ func main() {
 	// 初始化服务，调用服务端的"user-service"服务 下的GetById方法
 	us := &UserService{}
 	ups := &UserParentService{}
-	err = c.InitService(us)
+	err = c.InitStub(us)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	err = c.InitService(ups)
+	err = c.InitStub(ups)
 	if err != nil {
 		log.Println(err)
 		return
@@ -41,6 +41,7 @@ func main() {
 			})
 			if err != nil {
 				log.Println(err)
+				wg.Done()
 				return
 			}
 			// 输出服务端返回结果
@@ -54,6 +55,7 @@ func main() {
 			})
 			if err != nil {
 				log.Println(err)
+				wg.Done()
 				return
 			}
 			// 输出服务端返回结果
