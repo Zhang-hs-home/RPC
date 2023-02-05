@@ -35,7 +35,7 @@ func NewClient(addr string, serializer serialize.Serializer) (*Client, error) {
 		Close: func(i interface{}) error {
 			return i.(net.Conn).Close()
 		},
-
+		Ping:        Ping,
 		IdleTimeout: time.Minute,
 	})
 	if err != nil {
@@ -69,9 +69,6 @@ func (c *Client) Invoke(ctx context.Context, req *message.Request) (*message.Res
 	if wLen != len(data) { // 几乎遇不到，如果遇到了，有没有更好的处理方法？
 		return nil, errors.New("rpc: 未写入全部数据")
 	}
-
-	// 该读数据了
-	// 我怎么知道该读取多长？相应的，服务端也会有这个问题。答案：你需要先传入一个长度字段，用于描述本次数据有多大
 
 	respMsg, err := ReadMsg(conn)
 	if err != nil {

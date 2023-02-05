@@ -89,6 +89,17 @@ func (s *Server) HandleConn(conn net.Conn) error {
 			Compressor: req.Compressor,
 			Serializer: req.Serializer,
 		}
+		// ping探活请求处理
+		if req.Ping == PingPong {
+			resp.Pong = PingPong
+			resp.CalcHeadLength()
+			_, err = conn.Write(message.EncodeResp(resp))
+			if err != nil {
+				return err
+			}
+
+			continue
+		}
 
 		// 找到本地对应的服务
 		service, ok := s.services[req.ServiceName]

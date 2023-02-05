@@ -33,8 +33,6 @@ func ReadMsg(conn net.Conn) (bs []byte, err error) {
 	if n != int(headLength+bodyLength-lenBytes) {
 		conn.Close()
 		return nil, errors.New("tcp连接未读够全部数据")
-		// 你没有读够，你根本不知道该怎么处理，例如你接着等待后续数据，如果后续数据不是本次请求的呢？你读进来了，不仅本次请求的数据不对了，你还
-		// 破坏了下次请求的数据
 	}
 	copy(bs, msgLenBytes)
 

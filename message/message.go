@@ -25,8 +25,8 @@ type Request struct {
 	Compressor byte
 	// 序列化协议
 	Serializer byte
-	// cpu内存对齐占位符 不会传入网络
-	Padding byte
+	// ping探活
+	Ping byte
 	// 服务名
 	ServiceName string
 	// 方法名
@@ -38,8 +38,8 @@ type Request struct {
 }
 
 func (r *Request) CalcHeadLength() {
-	// 固定15字节
-	res := 15
+	// 固定16字节
+	res := 16
 	res += len(r.ServiceName)
 	// 加一个换行符 \n 否则无法区分开serviceName 和methodName
 	res += 1
@@ -84,6 +84,9 @@ func EncodeReq(r *Request) []byte {
 	cur[0] = r.Serializer
 	cur = cur[1:]
 
+	cur[0] = r.Ping
+	cur = cur[1:]
+
 	copy(cur, r.ServiceName)
 	cur[len(r.ServiceName)] = splitter
 	cur = cur[len(r.ServiceName)+1:]
@@ -115,9 +118,10 @@ func DecodeReq(data []byte) *Request {
 	req.Version = data[12]
 	req.Compressor = data[13]
 	req.Serializer = data[14]
+	req.Ping = data[15]
 
 	// 取头部剩下所有的数据
-	remainHeader := data[15:req.HeadLength]
+	remainHeader := data[16:req.HeadLength]
 
 	// 取出服务名
 	split := bytes.IndexByte(remainHeader, splitter)
@@ -164,6 +168,8 @@ type Response struct {
 	Compressor byte
 	// 序列化协议
 	Serializer byte
+	// pong探活
+	Pong byte
 	// 错误信息 可以是业务error，也可以是框架error
 	Error []byte
 	// 协议体
@@ -171,7 +177,7 @@ type Response struct {
 }
 
 func (r *Response) CalcHeadLength() {
-	res := 15
+	res := 16
 	res += len(r.Error)
 	r.HeadLength = uint32(res)
 }
@@ -198,6 +204,9 @@ func EncodeResp(r *Response) []byte {
 	cur[0] = r.Serializer
 	cur = cur[1:]
 
+	cur[0] = r.Pong
+	cur = cur[1:]
+
 	copy(cur, r.Error)
 	cur = cur[len(r.Error):]
 
@@ -214,9 +223,10 @@ func DecodeResp(data []byte) *Response {
 	res.Version = data[12]
 	res.Compressor = data[13]
 	res.Serializer = data[14]
+	res.Pong = data[15]
 
 	// 取出error
-	remainErr := data[15:res.HeadLength]
+	remainErr := data[16:res.HeadLength]
 	res.Error = remainErr
 
 	// 剩下的就是协议体了
