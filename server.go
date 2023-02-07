@@ -113,14 +113,7 @@ func (s *Server) HandleConn(conn net.Conn) error {
 
 			continue
 		}
-
-		// 找到方法 这里只能通过反射 没别的路子
-
-		// 把参数传进去
 		ctx := context.Background()
-		// 需要把req.Arg 赋值给methodReq Arg是map[string]interface{}类型
-		// 编码resp返回
-
 		data, err := service.invoke(ctx, req)
 		if err != nil {
 			resp.Error = []byte(err.Error())

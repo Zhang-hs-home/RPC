@@ -32,7 +32,7 @@ type Request struct {
 	// 方法名
 	MethodName string
 	// 元数据 可扩展
-	Meta map[string]string // 也可以用[]byte，但是问题是处理起来麻烦
+	Meta map[string]string // 也可以用[]byte，但是处理起来麻烦
 	// 消息体
 	Data []byte // 不要用interface，interface不知道类型，所以序列化之后是一个map[string]interface类型
 }

@@ -59,7 +59,6 @@ func (c *Client) Invoke(ctx context.Context, req *message.Request) (*message.Res
 	}
 
 	conn := obj.(net.Conn)
-	// 真正把数据发出去
 	data := message.EncodeReq(req)
 	wLen, err := conn.Write(data)
 	if err != nil {
