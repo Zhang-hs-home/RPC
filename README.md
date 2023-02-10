@@ -93,7 +93,8 @@ c.Close()
 返回值也必须由两个参数组成，response结构体+error。
   
 ## 结语
-本RPC框架的设计思路，写在了https://juejin.cn/post/7197414501006803002上，欢迎阅读。
+本RPC框架的设计思路，写在了https://juejin.cn/post/7197414501006803002
+上，欢迎阅读。
 
 同时欢迎各位fork，star，或者提出宝贵的意见！
   

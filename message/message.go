@@ -125,7 +125,7 @@ func DecodeReq(data []byte) *Request {
 
 	// 取出服务名
 	split := bytes.IndexByte(remainHeader, splitter)
-	req.ServiceName = string(remainHeader[:split]) // todo 可以用unsafe加速
+	req.ServiceName = string(remainHeader[:split])
 	remainHeader = remainHeader[split+1:]
 
 	// 取出方法名
