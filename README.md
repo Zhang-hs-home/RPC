@@ -15,7 +15,7 @@
 
 ### 服务端
 ```go
-// 首先需要定义服务端所提供的服务，以及服务下的方法，Name方法用于描述服务的名称
+// 首先需要定义服务端所提供的服务，以及服务下的方法，Name方法用于描述此服务的名称
 type UserService struct {
 }
 
@@ -44,7 +44,7 @@ if err := srv.Start("localhost:8080"); err != nil {
 ```
 ### 客户端
 ```go
-// 首先需要定义客户端期望调用的远程服务，以及服务下的方法，并实现Name方法用于标识服务名称
+// 首先需要定义客户端期望调用的远程服务，以及服务下的方法，并实现Name方法，服务端会根据name方法寻找对应的服务
 type UserService struct {
 	GetById func(ctx context.Context, req *GetByIdReq) (*GetByIdResp, error)
 }
@@ -62,18 +62,20 @@ type GetByIdResp struct {
 	Name string `json:"name"`
 }
 
-// 之后就是初始化客户端实例，初始化stub，之后调用方法
+// 初始化客户端实例
 c, err := RPC.NewClient("localhost:8080", json.SerializerJson{})
 if err != nil {
     return
 }
 
+// 初始化client stub
 us := &UserService{}
 err = c.InitService(us)
 if err != nil {
     return
 }
 
+// 调用RPC方法
 res, err := us.GetById(context.Background(), &GetByIdReq{
     Id: 123,
 })
@@ -89,8 +91,8 @@ c.Close()
 
 ## 注意事项
 
-- 我们强制规定，每一个方法的入参必须由两个参数组成，上下文+request结构体，
-返回值也必须由两个参数组成，response结构体+error。
+- 我们强制规定，每一个方法的入参必须由两个参数组成，上下文+request结构体指针，
+返回值也必须由两个参数组成，response结构体指针+error。
   
 ## 结语
 本RPC框架的设计思路，写在了https://juejin.cn/post/7197414501006803002
